@@ -23,6 +23,6 @@ if (process.env.NODE_ENV === 'dev') {
 } else {
 
 
-    urlDB = 'mongodb+srv://bombasen:euringa666@cluster0.bu4es.mongodb.net/cafe?retryWrites=true&w=majority';
+    urlDB = process.env.MONGO_URL;
 }
 process.env.URLDB = urlDB;
