@@ -14,10 +14,12 @@ app.use(bodyParser.json())
 app.use(require("./routes/usuario"));
 
 
-mongoose.connect("mongodb://localhost:27017/cafe", (error, resp) => {
-    if (error) throw error;
-    console.log("Conectado a la base de datos correctamente")
-})
+mongoose.connect(process.env.URLDB, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true },
+    (error, resp) => {
+        if (error) throw error;
+        console.log("Conectado a la base de datos correctamente")
+    })
+
 app.listen(process.env.PORT, () => {
     console.log("Escuchando puerto 3000");
 })
