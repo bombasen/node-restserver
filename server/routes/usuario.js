@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const _ = require('underscore');
 
 const Usuario = require("../models/usuario");
-const { verificaToken } = require('../middlewares/autenticacion.js');
+const { verificaToken, verificaAdmin } = require('../middlewares/autenticacion.js');
 
 
 //quizas haya que hacer cambios para que devuelva un user unico
@@ -45,7 +45,7 @@ app.get('/usuario', verificaToken, (req, res) => {
 
 });
 
-app.post('/usuario', verificaToken, function(req, res) {
+app.post('/usuario', [verificaToken, verificaAdmin], function(req, res) {
     let body = req.body;
 
     let usuario = new Usuario({
@@ -72,7 +72,7 @@ app.post('/usuario', verificaToken, function(req, res) {
 
 })
 
-app.put('/usuario/:id', verificaToken, (req, res) => {
+app.put('/usuario/:id', [verificaToken, verificaAdmin], (req, res) => {
 
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']);
@@ -95,7 +95,7 @@ app.put('/usuario/:id', verificaToken, (req, res) => {
 
 })
 
-app.delete('/usuario/:id', verificaToken, (req, res) => {
+app.delete('/usuario/:id', [verificaToken, verificaAdmin], (req, res) => {
 
     let cambiaEstado = {
         estado: false
