@@ -42,3 +42,9 @@ if (process.env.NODE_ENV === 'dev') {
     urlDB = process.env.MONGO_URL;
 }
 process.env.URLDB = urlDB;
+
+//------------------------------------------
+//SEED de autenticacion
+//-----------------------------------------
+
+process.env.CLIENT_ID = process.env.CLIENT_ID || "225986566103-t8var40mrab903jh2ri4rjq5dsuaa91a.apps.googleusercontent.com";

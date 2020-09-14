@@ -19,32 +19,31 @@ app.post('/login', (req, res) => {
 
         if (err) {
 
-            return res.status(500).json({
+            return res.estatus(500).json({
                 ok: false,
                 err
             });
 
         }
 
-        console.log(usuarioDB);
-
         if (!usuarioDB) {
 
             return res.status(400).json({
                 ok: false,
                 err: {
-                    message: '(Usuario) o contraseña incorrectos'
+                    message: 'Usuario o contraseña incorrectos'
                 }
             });
 
         }
-        //console.log(body.password)
+
+
         if (!bcrypt.compareSync(body.password, usuarioDB.password)) {
 
             return res.status(400).json({
                 ok: false,
                 err: {
-                    message: 'Usuario o (contraseña) incorrectos'
+                    message: 'Usuario o contraseña incorrectos'
                 }
             });
 
@@ -64,9 +63,7 @@ app.post('/login', (req, res) => {
 
 });
 
-
-// CONFIGURACIONES GOOGLE
-
+//configuraciones de google
 
 async function verify(token) {
     const ticket = await client.verifyIdToken({
@@ -83,12 +80,13 @@ async function verify(token) {
         img: payload.picture,
         google: true
     }
+
 }
 
 
 app.post('/google', async(req, res) => {
-    let token = req.body.idtoken;
 
+    let token = req.body.idtoken;
 
     let googleUser = await verify(token)
         .catch(e => {
@@ -97,74 +95,76 @@ app.post('/google', async(req, res) => {
                 err: e
             });
         });
-    console.log(googleUser)
 
     Usuario.findOne({ email: googleUser.email }, (err, usuarioDB) => {
-        console.log(usuarioDB)
+
         if (err) {
-            console.log(1)
             return res.status(500).json({
                 ok: false,
                 err
             });
-        }
+        };
+
         if (usuarioDB) {
             if (usuarioDB.google === false) {
-                return res.status(400).json({
+                // return res.status(400).json({
+                //     ok: false,
+                //     err: {
+                //         message: 'Debe de usar su autenticacion normal'
+                //     }
+                //});
+                // return res.send("dsgdsgdsg")
+                return res.status(500).json({
                     ok: false,
-                    err: {
-                        message: "debe de usar su atentificación normal"
-                    }
+                    err
                 });
             } else {
                 let token = jwt.sign({
                     usuario: usuarioDB
                 }, process.env.SEED, { expiresIn: process.env.CADUCIDAD_TOKEN });
 
-                res.json({
+                return res.json({
                     ok: true,
-                    usuario: googleUser,
+                    usuario: usuarioDB,
                     token
-                })
-
+                });
             }
         } else {
+            //si el usuario no existe en nuestra base de datos
+            let usuario = new Usuario();
 
-            // si el usuario no existe en nuestra base de datos
-            let usuario = new Usuario()
-            usuario.nombre = googleUser.nombre
-            usuario.email = googleUser.email
-            usuario.img = googleUser.img
-            usuario.google = googleUser.true
-            usuario.password = ":)"
+            usuario.nombre = googleUser.nombre;
+            usuario.email = googleUser.email;
+            usuario.img = googleUser.img;
+            usuario.google = true;
+            usuario.password = ':)';
 
-            usuario.save((err, usuarioDB => {
-
+            usuario.save((err, usuarioDB) => {
                 if (err) {
                     return res.status(500).json({
                         ok: false,
                         err
-                    })
-                }
+                    });
+                };
 
                 let token = jwt.sign({
                     usuario: usuarioDB
                 }, process.env.SEED, { expiresIn: process.env.CADUCIDAD_TOKEN });
 
-                res.json({
+                return res.json({
                     ok: true,
-                    usuario: googleUser,
+                    usuario: usuarioDB,
                     token
-                })
+                });
+            });
 
+        };
 
-            }))
-        }
-
-
-    })
+    });
 
 });
+
+
 
 
 
